@@ -119,31 +119,20 @@ namespace TiendaOnline.Web.Controllers
         // GET: Countries/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
+            if (id == null) {
                 return NotFound();
             }
-
-            var country = await _context.Countries
+            Country country = await _context.Countries
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (country == null)
-            {
+            if (country == null) {
                 return NotFound();
             }
-
-            return View(country);
-        }
-
-        // POST: Countries/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var country = await _context.Countries.FindAsync(id);
             _context.Countries.Remove(country);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
             return RedirectToAction(nameof(Index));
         }
+
+
 
         private bool CountryExists(int id)
         {
