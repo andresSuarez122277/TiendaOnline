@@ -22,6 +22,30 @@ namespace TiendaOnline.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("TiendaOnline.Web.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("TiendaOnline.Web.Models.City", b =>
                 {
                     b.Property<int>("Id")
@@ -95,6 +119,65 @@ namespace TiendaOnline.Web.Migrations
                     b.ToTable("Departments");
                 });
 
+            modelBuilder.Entity("TiendaOnline.Web.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsStarred")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("TiendaOnline.Web.Models.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages");
+                });
+
             modelBuilder.Entity("TiendaOnline.Web.Models.City", b =>
                 {
                     b.HasOne("TiendaOnline.Web.Models.Department", null)
@@ -109,6 +192,22 @@ namespace TiendaOnline.Web.Migrations
                         .HasForeignKey("CountryId");
                 });
 
+            modelBuilder.Entity("TiendaOnline.Web.Models.Product", b =>
+                {
+                    b.HasOne("TiendaOnline.Web.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TiendaOnline.Web.Models.ProductImage", b =>
+                {
+                    b.HasOne("TiendaOnline.Web.Models.Product", null)
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ProductId");
+                });
+
             modelBuilder.Entity("TiendaOnline.Web.Models.Country", b =>
                 {
                     b.Navigation("Departments");
@@ -117,6 +216,11 @@ namespace TiendaOnline.Web.Migrations
             modelBuilder.Entity("TiendaOnline.Web.Models.Department", b =>
                 {
                     b.Navigation("Cities");
+                });
+
+            modelBuilder.Entity("TiendaOnline.Web.Models.Product", b =>
+                {
+                    b.Navigation("ProductImages");
                 });
 #pragma warning restore 612, 618
         }

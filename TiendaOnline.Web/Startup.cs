@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using TiendaOnline.Web.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TiendaOnline.Web.Helpers;
 
 namespace TiendaOnline.Web
 {
@@ -35,6 +36,10 @@ namespace TiendaOnline.Web
             services.AddDbContext<ApplicationDbContext>(
                 cfg => { cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
+            services.AddTransient<SeedDb>();
+            services.AddScoped<IBlobHelper, BlobHelper>();
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+            services.AddScoped<ICombosHelper, CombosHelper>();
             services.AddControllersWithViews();
         }
 
