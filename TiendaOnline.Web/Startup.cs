@@ -13,6 +13,10 @@ using TiendaOnline.Web.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TiendaOnline.Web.Helpers;
+using Microsoft.AspNetCore.Identity;
+using TiendaOnline.Web.Data.Entities;
+
+
 
 namespace TiendaOnline.Web
 {
@@ -33,6 +37,16 @@ namespace TiendaOnline.Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.AddIdentity<User, IdentityRole>(cfg =>
+            {
+                cfg.User.RequireUniqueEmail = true;
+                cfg.Password.RequireDigit = false;
+                cfg.Password.RequiredUniqueChars = 0;
+                cfg.Password.RequireLowercase = false;
+                cfg.Password.RequireNonAlphanumeric = false;
+                cfg.Password.RequireUppercase = false;
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddDbContext<ApplicationDbContext>(
                 cfg => { cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
@@ -40,7 +54,8 @@ namespace TiendaOnline.Web
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<ICombosHelper, CombosHelper>();
-            services.AddControllersWithViews();
+            services.AddScoped<IUserHelper, UserHelper>();
+            services.AddControllersWithViews();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,10 +73,9 @@ namespace TiendaOnline.Web
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
