@@ -1,5 +1,6 @@
 ﻿namespace TiendaOnline.Web.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System;
@@ -10,6 +11,7 @@
     using TiendaOnline.Web.Helpers;
     using TiendaOnline.Web.Models;
 
+    [Authorize(Roles = "Admin")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;

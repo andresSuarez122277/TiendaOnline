@@ -5,10 +5,11 @@ using TiendaOnline.Web.Data;
 using System;
 using TiendaOnline.Web.Helpers;
 using TiendaOnline.Web.Models;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace TiendaOnline.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;

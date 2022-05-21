@@ -37,7 +37,7 @@ namespace TiendaOnline.Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            services.AddIdentity<User, IdentityRole>(cfg =>
+            services.AddIdentity<User, Microsoft.AspNetCore.Identity.IdentityRole>(cfg =>
             {
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireDigit = false;
@@ -47,15 +47,29 @@ namespace TiendaOnline.Web
                 cfg.Password.RequireUppercase = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddDbContext<ApplicationDbContext>(
-                cfg => { cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddAuthentication()
+            .AddCookie().AddJwtBearer(cfg =>
+    {
+        cfg.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = Configuration["Tokens:Issuer"],
+            ValidAudience = Configuration["Tokens:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+        };
+    });
+
+
+            IServiceCollection serviceCollection = services.AddDbContext<ApplicationDbContext>(
+                cfg =>
+                {
+                    cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
             services.AddTransient<SeedDb>();
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<ICombosHelper, CombosHelper>();
             services.AddScoped<IUserHelper, UserHelper>();
-            services.AddControllersWithViews();            
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
