@@ -15,8 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using TiendaOnline.Web.Helpers;
 using Microsoft.AspNetCore.Identity;
 using TiendaOnline.Web.Data.Entities;
-
-
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace TiendaOnline.Web
 {
