@@ -13,6 +13,8 @@ using TiendaOnline.Web.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TiendaOnline.Web.Helpers;
+using TiendaOnline.Web.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace TiendaOnline.Web
 {
@@ -33,6 +35,16 @@ namespace TiendaOnline.Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.AddIdentity<User, IdentityRole>(cfg =>
+            {
+                cfg.User.RequireUniqueEmail = true;
+                cfg.Password.RequireDigit = false;
+                cfg.Password.RequiredUniqueChars = 0;
+                cfg.Password.RequireLowercase = false;
+                cfg.Password.RequireNonAlphanumeric = false;
+                cfg.Password.RequireUppercase = false;
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddDbContext<ApplicationDbContext>(
                 cfg => { cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
@@ -40,6 +52,7 @@ namespace TiendaOnline.Web
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<ICombosHelper, CombosHelper>();
+            services.AddScoped<IUserHelper, UserHelper>();
             services.AddControllersWithViews();
         }
 
@@ -58,11 +71,9 @@ namespace TiendaOnline.Web
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseAuthentication();
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

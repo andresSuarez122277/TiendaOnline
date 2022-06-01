@@ -1,20 +1,29 @@
-﻿namespace TiendaOnline.Web.Data
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TiendaOnline.Web.Data.Entities;
+using TiendaOnline.Web.Enums;
+using TiendaOnline.Web.Helpers;
+using TiendaOnline.Web.Models;
+
+namespace TiendaOnline.Web.Data
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using TiendaOnline.Web.Models;
     public class SeedDb
     {
         private readonly ApplicationDbContext _context;
-        public SeedDb(ApplicationDbContext context)
+        private readonly IUserHelper _userHelper;
+        public SeedDb(ApplicationDbContext context, IUserHelper userHelper)
         {
             _context = context;
+            _userHelper = userHelper;
         }
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
             await CheckCountriesAsync();
+            await CheckRolesAsync();
+            await CheckUserAsync("1010", "Orlando", "A", "oralpez@hotmail.com", "3000000000", "Calle Luna Calle Sol", UserType.Admin);
+
         }
         private async Task CheckCountriesAsync()
         {
@@ -81,5 +90,43 @@
                 await _context.SaveChangesAsync();
             }
         }
+        private async Task CheckRolesAsync()
+        {
+            await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
+            await _userHelper.CheckRoleAsync(UserType.User.ToString());
+        }
+
+        private async Task<User> CheckUserAsync(
+            string document,
+            string firstName,
+            string lastName,
+            string email,
+            string phone,
+            string address,
+            UserType userType)
+        {
+            User user = await _userHelper.GetUserAsync(email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    PhoneNumber = phone,
+                    Address = address,
+                    Document = document,
+                    City = _context.Cities.FirstOrDefault(),
+                    UserType = userType
+                };
+
+                await _userHelper.AddUserAsync(user, "1234");
+                await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+            }
+
+            return user;
+        }
+
     }
 }
