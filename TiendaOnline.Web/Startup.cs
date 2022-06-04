@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using TiendaOnline.Web.Helpers;
 using TiendaOnline.Web.Data.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace TiendaOnline.Web
 {
@@ -44,9 +46,21 @@ namespace TiendaOnline.Web
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequireUppercase = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
-
+            services.AddAuthentication()
+    .AddCookie()
+    .AddJwtBearer(cfg =>
+    {
+        cfg.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = Configuration["Tokens:Issuer"],
+            ValidAudience = Configuration["Tokens:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+        };
+    });
             services.AddDbContext<ApplicationDbContext>(
-                cfg => { cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                cfg =>
+                {
+                    cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
             services.AddTransient<SeedDb>();
             services.AddScoped<IBlobHelper, BlobHelper>();
